@@ -1,0 +1,40 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>tiny-harness 瀏覽器 demo</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{margin:0;height:100dvh;display:flex;flex-direction:column;background:#0d1117;color:#d6e2e8;
+       font:14px/1.6 system-ui,"Noto Sans TC",sans-serif}
+  header{padding:10px 12px;border-bottom:1px solid #223;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  input,select{padding:6px 8px;border:1px solid #2a3a45;border-radius:6px;background:#111a20;color:inherit;font:inherit}
+  #term{flex:1;min-height:0}
+  small{opacity:.6}
+</style>
+<header>
+  <input id="key" type="password" placeholder="LLMSHARE_API_KEY" size="30">
+  <input id="model" value="glm-5.2" size="18">
+  <small>金鑰只留在這個分頁的記憶體裡，不寫 localStorage。關掉就沒了。</small>
+</header>
+<div id="term"></div>
+<script type="module">
+  import { mountTerminal, TERMINAL_CSS } from "./terminal.js";
+  document.head.append(Object.assign(document.createElement("style"), { textContent: TERMINAL_CSS }));
+
+  // demo 用的頁面工具：證明「工具由 host 注入」這條路真的通。
+  const tools = [{
+    name: "set_background",
+    description: "把這個頁面的背景換成指定顏色。",
+    parameters: { type: "object", properties: { color: { type: "string", description: "CSS 顏色" } }, required: ["color"] },
+    run: ({ color }) => { document.body.style.background = color; return `背景已換成 ${color}`; },
+  }];
+
+  // 設定用函式傳：送出當下才讀，改欄位不必重掛（重掛會清掉對話）。
+  mountTerminal(document.getElementById("term"), {
+    baseUrl: "https://llm-share.duotify.com/v1",
+    apiKey: () => document.getElementById("key").value,
+    model: () => document.getElementById("model").value,
+    tools,
+    system: "你在一個網頁裡。用正體中文回答，不要用 emoji。要改頁面就用工具。",
+    greeting: "先在上面貼金鑰，然後說話。試試「把背景換成深綠色」。",
+  });
+</script>

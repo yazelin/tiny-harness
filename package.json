@@ -1,0 +1,17 @@
+{
+  "name": "tiny-harness",
+  "version": "0.1.0",
+  "description": "一支極小的 agent loop,終端機與瀏覽器共用同一份核心",
+  "type": "module",
+  "main": "core.js",
+  "exports": { ".": "./core.js", "./web": "./web/terminal.js" },
+  "files": ["core.js", "cli.js", "web"],
+  "scripts": {
+    "test": "node test.js",
+    "cli": "node cli.js",
+    "demo": "python3 -m http.server 8191 --bind 127.0.0.1"
+  },
+  "license": "MIT",
+  "author": "林亞澤",
+  "engines": { "node": ">=18" }
+}
