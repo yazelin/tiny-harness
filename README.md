@@ -50,6 +50,17 @@ bash <(curl -fsSL https://raw.githubusercontent.com/yazelin/tiny-harness/main/ag
 
 兩個地方寫成這樣是有原因的：模型跑的指令失敗是常態，所以工具那行加了 `|| true`，否則 `set -e` 會讓一個 `cat` 讀不到檔案就殺掉整個 agent；工具往返有 12 圈上限，跟核心一樣防打轉。
 
+### 它不做什麼
+
+`bash` 這個工具讓它能碰的東西沒有上限，但能做跟做得好是兩回事。四個天花板，撞到之前先知道：
+
+- **沒有記憶。** 關掉就從零開始，沒有 session、沒有 `--continue`。
+- **沒有 `edit`。** 要改檔只能叫它 `sed` 或整檔 heredoc 覆蓋，長檔案容易改壞。
+- **工具輸出截在 8000 字元**，而且模型不知道自己被截斷了，`cat` 一個大檔它會以為那就是全部。
+- **輸入端沒有 context 管理。** 聊久了會撞模型的 context 上限，撞到就是 400。
+
+要真的幹活，用 `pi`、Claude Code 或 Codex，那些有 read/edit/write、session、擴充套件。這支的價值在於八十四行看得完：要理解 agent loop 實際上是什麼，或要塞一個只有你自己需要的工具進去，改這八十四行比改一整套框架快。
+
 ## 用在網頁
 
 ```js
