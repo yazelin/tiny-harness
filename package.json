@@ -5,7 +5,7 @@
   "type": "module",
   "main": "core.js",
   "exports": { ".": "./core.js", "./web": "./web/terminal.js" },
-  "files": ["core.js", "cli.js", "web"],
+  "files": ["core.js", "cli.js", "agent.sh", "web"],
   "scripts": {
     "test": "node test.js",
     "cli": "node cli.js",

@@ -19,6 +19,31 @@ node cli.js glm-5.2 --yolo  # 跑 bash 前不再詢問
 
 環境變數 `LLMSHARE_BASE_URL` 可以換閘道，預設 `https://llm-share.duotify.com/v1`。任何 OpenAI 相容端點都能接。
 
+## 不裝 Node 的版本:agent.sh
+
+`agent.sh` 是同一套工具往返的 bash 實作，只相依 `curl` 與 `jq`，四十幾行。
+
+```bash
+export LLMSHARE_API_KEY='你的-Virtual-Key'
+./agent.sh                                # 預設 glm-5.2
+./agent.sh deepseek-v4.1-flash            # 指定模型
+./agent.sh deepseek-v4.1-flash --yolo     # 跑 bash 前不再詢問
+```
+
+端點同樣讀 `LLMSHARE_BASE_URL`，預設就是多奇的閘道 `https://llm-share.duotify.com/v1`。模型代號用 `llmshare models` 查，要打別的 OpenAI 相容端點就改這個環境變數。
+
+它是單一檔案，所以可以直接從 raw URL 跑起來，不需要 clone 也不需要 npm：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/yazelin/tiny-harness/main/agent.sh | bash -s -- deepseek-v4.1-flash
+```
+
+只有 `bash` 一個工具，因為 `cat` 與 heredoc 已經涵蓋讀寫檔案。`max_tokens` 查表跟 `core.js` 的 `maxOutput()` 同一份規則，改一邊要記得改另一邊。
+
+它不做串流。`jq` 解 SSE 不划算，要看逐字吐出去用 `cli.js`。
+
+兩個地方寫成這樣是有原因的：模型跑的指令失敗是常態，所以工具那行加了 `|| true`，否則 `set -e` 會讓一個 `cat` 讀不到檔案就殺掉整個 agent；工具往返有 12 圈上限，跟核心一樣防打轉。
+
 ## 用在網頁
 
 ```js
@@ -95,7 +120,9 @@ npm test
 
 ## 已驗證
 
-對 `llm-share.duotify.com` 實測過，非串流與串流兩種模式的 tool calling 都通，串流的 `tool_calls` 會分批送達，所以核心按 `index` 累加。瀏覽器端用 Playwright 驗過完整一輪：送出訊息、模型呼叫 `set_background`、頁面背景真的變色。
+`agent.sh` 對 `llm-share.duotify.com` 實測過 `deepseek-v4.1-flash`：工具呼叫成功那條、以及工具指令失敗（`cat` 不存在的檔案）之後迴圈沒被殺掉、錯誤回給模型繼續講話那條，兩條都通。
+
+核心 `core.js` 對 `llm-share.duotify.com` 實測過，非串流與串流兩種模式的 tool calling 都通，串流的 `tool_calls` 會分批送達，所以核心按 `index` 累加。瀏覽器端用 Playwright 驗過完整一輪：送出訊息、模型呼叫 `set_background`、頁面背景真的變色。
 
 ## 授權
 
