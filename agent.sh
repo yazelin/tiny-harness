@@ -19,12 +19,15 @@ MODEL="${MODEL:-deepseek-v4.1-flash}"
 MAX_STEPS=12
 SHOW="${AGENT_SHOW_LINES:-12}"   # 畫面只印前幾行；送給模型的永遠是完整內容
 
-# 與 core.js 的 maxOutput() 同一張表。給太小會讓 reasoning 吃光額度、content 回空字串。
+# 與 core.js 的 maxOutput()、llmshare 的 model_max_output() 同一張表（量測見
+# duotify-ollama-cloud-setup issue #1）。給太小會讓 reasoning 吃光額度、content 回空字串。
+# LLMSHARE_MAX_OUTPUT_TOKENS 可以覆蓋，跟 llmshare 同一個變數名。
 case "$MODEL" in
   glm-*|gpt-oss:*|minimax-*|nemotron-3-nano:*) MAX_TOKENS=131072 ;;
   mistral-large-3:*|kimi-*|gemma4:*)           MAX_TOKENS=262144 ;;
   *)                                            MAX_TOKENS=65536 ;;
 esac
+MAX_TOKENS="${LLMSHARE_MAX_OUTPUT_TOKENS:-$MAX_TOKENS}"
 
 TOOLS='[{"type":"function","function":{
   "name":"bash","description":"在使用者機器上執行 bash 指令,回傳 stdout 與 stderr。",

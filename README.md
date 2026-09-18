@@ -30,12 +30,16 @@ export LLMSHARE_API_KEY='你的-Virtual-Key'
 ./agent.sh deepseek-v4.1-flash --yolo     # 跑 bash 前不再詢問
 ```
 
+不要寫成 `curl ... | bash`。那樣 `bash` 是從 stdin 讀腳本的，而這支程式自己也要從 stdin 讀你打的字，管線已經被吃掉，結果是印完一行 banner 就結束。要用上面的 process substitution。
+
+`LLMSHARE_MAX_OUTPUT_TOKENS` 跟 `llmshare` 吃同一個變數名，可以覆蓋查表結果。
+
 端點同樣讀 `LLMSHARE_BASE_URL`，預設就是多奇的閘道 `https://llm-share.duotify.com/v1`。模型代號用 `llmshare models` 查，要打別的 OpenAI 相容端點就改這個環境變數。
 
-它是單一檔案，所以可以直接從 raw URL 跑起來，不需要 clone 也不需要 npm（這個 repo 還沒有推上 GitHub，下面的網址要等推上去才會通）：
+它是單一檔案，所以可以直接從 raw URL 跑起來，不需要 clone 也不需要 npm：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yazelin/tiny-harness/main/agent.sh | bash -s -- deepseek-v4.1-flash
+bash <(curl -fsSL https://raw.githubusercontent.com/yazelin/tiny-harness/main/agent.sh) --yolo
 ```
 
 工具輸出在畫面上只印前 12 行，`AGENT_SHOW_LINES` 可以調；送給模型的永遠是完整內容（上限 8000 字元）。一句 `ip addr show` 就能洗掉整個畫面，但模型需要看全部。
