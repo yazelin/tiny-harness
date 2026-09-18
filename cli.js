@@ -73,7 +73,7 @@ const tools = [
 const messages = [
   {
     role: "system",
-    content: `你是跑在使用者終端機裡的助理。工作目錄是 ${process.cwd()}。用正體中文回答，不要用 emoji。需要知道機器上的事就用工具查，不要猜。`,
+    content: `你是跑在使用者終端機裡的助理。工作目錄是 ${process.cwd()}。需要知道機器上的事就用工具查，不要猜。一律用台灣正體中文與全形標點，不得出現任何簡體字。不要用 emoji。`,
   },
 ];
 

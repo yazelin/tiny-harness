@@ -30,7 +30,7 @@ TOOLS='[{"type":"function","function":{
   "parameters":{"type":"object","properties":{"cmd":{"type":"string"}},"required":["cmd"]}}}]'
 
 H=$(mktemp); trap 'rm -f "$H" "$H.t"' EXIT
-jq -n '[{role:"system",content:"你是終端機裡的助手。需要看檔案或跑指令時用 bash 工具。用正體中文回答。"}]' > "$H"
+jq -n '[{role:"system",content:"你是終端機裡的助手。需要看檔案或跑指令時用 bash 工具，不要猜。一律用台灣正體中文，標點一律全形（，。：；？！），不得出現任何簡體字。不要用 emoji。"}]' > "$H"
 push() { jq "$@" "$H" > "$H.t" && mv "$H.t" "$H"; }
 say()  { printf '\033[36m%s\033[0m\n' "$1"; }
 
