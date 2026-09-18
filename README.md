@@ -42,7 +42,12 @@ export LLMSHARE_API_KEY='你的-Virtual-Key'
 bash <(curl -fsSL https://raw.githubusercontent.com/yazelin/tiny-harness/main/agent.sh) --yolo
 ```
 
-工具輸出在畫面上只印前 12 行，`AGENT_SHOW_LINES` 可以調；送給模型的永遠是完整內容（上限 8000 字元）。一句 `ip addr show` 就能洗掉整個畫面，但模型需要看全部。
+工具輸出在畫面上只印前 12 行，送給模型的永遠是完整內容（上限 8000 字元）。一句 `ip addr show` 就能洗掉整個畫面，但模型需要看全部，所以兩邊分開處理。
+
+```bash
+AGENT_SHOW_LINES=40 ./agent.sh   # 印多一點
+AGENT_SHOW_LINES=0  ./agent.sh   # 只顯示它下了什麼指令，輸出完全不印
+```
 
 只有 `bash` 一個工具，因為 `cat` 與 heredoc 已經涵蓋讀寫檔案。`max_tokens` 查表跟 `core.js` 的 `maxOutput()` 同一份規則，改一邊要記得改另一邊。
 

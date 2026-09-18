@@ -17,7 +17,7 @@ for a in "$@"; do
 done
 MODEL="${MODEL:-deepseek-v4.1-flash}"
 MAX_STEPS=12
-SHOW="${AGENT_SHOW_LINES:-12}"   # 畫面只印前幾行；送給模型的永遠是完整內容
+SHOW="${AGENT_SHOW_LINES:-12}"   # 畫面只印前幾行，0 = 完全不印；送給模型的永遠是完整內容
 
 # 與 core.js 的 maxOutput()、llmshare 的 model_max_output() 同一張表（量測見
 # duotify-ollama-cloud-setup issue #1）。給太小會讓 reasoning 吃光額度、content 回空字串。
@@ -71,11 +71,13 @@ while :; do
       # 工具失敗不中斷迴圈,錯誤訊息當結果回給模型,讓它自己修
       # set -e + pipefail:指令失敗是常態,不能讓它殺掉 agent
       [ -n "$out" ] || out=$(bash -c "$cmd" 2>&1 | head -c 8000 || true)
-      # 畫面截斷與送給模型的內容是兩件事，這裡只截畫面
-      n=$(grep -c '' <<<"$out")
-      head -n "$SHOW" <<<"$out" | sed 's/^/  | /'
-      if [ "$n" -gt "$SHOW" ]; then
-        printf '  \033[2m| … 還有 %d 行，已完整送給模型\033[0m\n' "$((n - SHOW))"
+      # 畫面截斷與送給模型的內容是兩件事，這裡只截畫面。SHOW=0 完全不印。
+      if [ "$SHOW" -gt 0 ]; then
+        n=$(grep -c '' <<<"$out")
+        head -n "$SHOW" <<<"$out" | sed 's/^/  | /'
+        if [ "$n" -gt "$SHOW" ]; then
+          printf '  \033[2m| … 還有 %d 行，已完整送給模型\033[0m\n' "$((n - SHOW))"
+        fi
       fi
       push --arg id "$id" --arg c "$out" '. + [{role:"tool",tool_call_id:$id,content:$c}]'
     done <<<"$calls"
