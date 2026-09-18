@@ -17,7 +17,7 @@ const BASE = process.env.LLMSHARE_BASE_URL || "https://llm-share.duotify.com/v1"
 const KEY = process.env.LLMSHARE_API_KEY;
 const argv = process.argv.slice(2);
 const YOLO = argv.includes("--yolo");
-const MODEL = argv.find((a) => !a.startsWith("-")) || "glm-5.2";
+const MODEL = argv.find((a) => !a.startsWith("-")) || "deepseek-v4.1-flash";
 
 if (!KEY) {
   console.error("未設 LLMSHARE_API_KEY。先 export LLMSHARE_API_KEY=你的-Virtual-Key");

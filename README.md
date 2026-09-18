@@ -10,9 +10,9 @@
 
 ```bash
 export LLMSHARE_API_KEY='你的-Virtual-Key'
-node cli.js                 # 預設 glm-5.2
-node cli.js kimi-k2.7-code  # 指定模型
-node cli.js glm-5.2 --yolo  # 跑 bash 前不再詢問
+node cli.js                             # 預設 deepseek-v4.1-flash
+node cli.js kimi-k2.7-code              # 指定模型
+node cli.js deepseek-v4.1-flash --yolo  # 跑 bash 前不再詢問
 ```
 
 內建工具：`bash`、`read_file`、`write_file`。預設每次執行 bash 都會問過才跑，因為模型有權在你的機器上執行任何指令。`--yolo` 關掉這道確認。
@@ -25,8 +25,8 @@ node cli.js glm-5.2 --yolo  # 跑 bash 前不再詢問
 
 ```bash
 export LLMSHARE_API_KEY='你的-Virtual-Key'
-./agent.sh                                # 預設 glm-5.2
-./agent.sh deepseek-v4.1-flash            # 指定模型
+./agent.sh                                # 預設 deepseek-v4.1-flash
+./agent.sh glm-5.3                        # 指定模型
 ./agent.sh deepseek-v4.1-flash --yolo     # 跑 bash 前不再詢問
 ```
 
@@ -51,7 +51,7 @@ import { mountTerminal, TERMINAL_CSS } from "tiny-harness/web";
 
 mountTerminal(document.getElementById("term"), {
   baseUrl: "https://你的-worker/agent",   // 金鑰留在後端代打
-  model: "glm-5.2",
+  model: "deepseek-v4.1-flash",
   tools: [{
     name: "set_background",
     description: "把頁面背景換成指定顏色。",

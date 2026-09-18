@@ -6,8 +6,16 @@ command -v jq >/dev/null || { echo "需要 jq"; exit 1; }
 : "${LLMSHARE_API_KEY:?請先 export LLMSHARE_API_KEY}"
 
 BASE="${LLMSHARE_BASE_URL:-https://llm-share.duotify.com/v1}"
-MODEL="${1:-glm-5.2}"
-YOLO="${2:-}"
+# 參數不看位置:第一個不以 - 開頭的是模型,--yolo 放哪都算
+MODEL=""; YOLO=""
+for a in "$@"; do
+  case "$a" in
+    --yolo) YOLO=1 ;;
+    -*)     echo "不認得的選項:$a"; exit 1 ;;
+    *)      [ -n "$MODEL" ] || MODEL="$a" ;;
+  esac
+done
+MODEL="${MODEL:-deepseek-v4.1-flash}"
 MAX_STEPS=12
 
 # 與 core.js 的 maxOutput() 同一張表。給太小會讓 reasoning 吃光額度、content 回空字串。
@@ -52,7 +60,7 @@ while :; do
       cmd=$(jq -r '.function.arguments | fromjson.cmd // ""' <<<"$call")
       say "  \$ $cmd"
       out=""
-      if [ "$YOLO" != "--yolo" ]; then
+      if [ -z "$YOLO" ]; then
         printf '  跑嗎? [y/N] '; read -r ok < /dev/tty || ok=n
         [ "$ok" = y ] || out="使用者拒絕執行這個指令。"
       fi
