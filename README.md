@@ -38,6 +38,8 @@ export LLMSHARE_API_KEY='你的-Virtual-Key'
 curl -fsSL https://raw.githubusercontent.com/yazelin/tiny-harness/main/agent.sh | bash -s -- deepseek-v4.1-flash
 ```
 
+工具輸出在畫面上只印前 12 行，`AGENT_SHOW_LINES` 可以調；送給模型的永遠是完整內容（上限 8000 字元）。一句 `ip addr show` 就能洗掉整個畫面，但模型需要看全部。
+
 只有 `bash` 一個工具，因為 `cat` 與 heredoc 已經涵蓋讀寫檔案。`max_tokens` 查表跟 `core.js` 的 `maxOutput()` 同一份規則，改一邊要記得改另一邊。
 
 它不做串流。`jq` 解 SSE 不划算，要看逐字吐出去用 `cli.js`。
