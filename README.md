@@ -45,9 +45,14 @@ bash <(curl -fsSL https://raw.githubusercontent.com/yazelin/tiny-harness/main/ag
 工具輸出在畫面上只印前 12 行，送給模型的永遠是完整內容（上限 8000 字元）。一句 `ip addr show` 就能洗掉整個畫面，但模型需要看全部，所以兩邊分開處理。
 
 ```bash
-AGENT_SHOW_LINES=40 ./agent.sh   # 印多一點
-AGENT_SHOW_LINES=0  ./agent.sh   # 只顯示它下了什麼指令，輸出完全不印
+AGENT_SHOW_LINES=40 ./agent.sh        # 印多一點
+AGENT_SHOW_LINES=0  ./agent.sh        # 只顯示它下了什麼指令，輸出完全不印
+AGENT_MAX_TOOL_CHARS=0 ./agent.sh     # 工具輸出不截斷（預設截在 100000 字元）
 ```
+
+`AGENT_MAX_TOOL_CHARS` 管的是餵給模型的量，跟畫面無關。截斷時會附一句告訴模型「共幾字元、只給你前幾字元」，這句不能省：少了它，模型會把前半段當成全部，基於殘缺內容下結論；有了它，實測模型會自己再下一個 `tail` 或 `grep` 去補缺的部分。
+
+真正的天花板是模型的 context，`deepseek-*` 約 1,048,576 token，未知模型保底 131,072，撞到回 400。另外對話每一輪都重送整段歷史，所以一次塞進去的大檔之後每輪都要重付。
 
 只有 `bash` 一個工具，因為 `cat` 與 heredoc 已經涵蓋讀寫檔案。`max_tokens` 查表跟 `core.js` 的 `maxOutput()` 同一份規則，改一邊要記得改另一邊。
 

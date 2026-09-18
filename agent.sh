@@ -17,7 +17,10 @@ for a in "$@"; do
 done
 MODEL="${MODEL:-deepseek-v4.1-flash}"
 MAX_STEPS=12
-SHOW="${AGENT_SHOW_LINES:-12}"   # 畫面只印前幾行，0 = 完全不印；送給模型的永遠是完整內容
+SHOW="${AGENT_SHOW_LINES:-12}"            # 畫面只印前幾行，0 = 完全不印
+# 工具輸出餵給模型的上限，0 = 不限。真正的天花板是模型 context（deepseek 約 1M token，
+# 未知模型保底 131072），撞到會回 400。另外對話每輪都重送整段歷史，所以塞太大會一直重付。
+LIMIT="${AGENT_MAX_TOOL_CHARS:-100000}"
 
 # 與 core.js 的 maxOutput()、llmshare 的 model_max_output() 同一張表（量測見
 # duotify-ollama-cloud-setup issue #1）。給太小會讓 reasoning 吃光額度、content 回空字串。
@@ -70,7 +73,14 @@ while :; do
       fi
       # 工具失敗不中斷迴圈,錯誤訊息當結果回給模型,讓它自己修
       # set -e + pipefail:指令失敗是常態,不能讓它殺掉 agent
-      [ -n "$out" ] || out=$(bash -c "$cmd" 2>&1 | head -c 8000 || true)
+      if [ -z "$out" ]; then
+        out=$(bash -c "$cmd" 2>&1 || true)
+        # 截斷要講出來，否則模型會把前半段當成全部,基於殘缺內容下結論
+        if [ "$LIMIT" -gt 0 ] && [ "${#out}" -gt "$LIMIT" ]; then
+          out="$(head -c "$LIMIT" <<<"$out")
+（輸出共 ${#out} 字元，只給你前 $LIMIT 字元，其餘已截斷。需要後面的請用 sed/grep/tail 自己取。）"
+        fi
+      fi
       # 畫面截斷與送給模型的內容是兩件事，這裡只截畫面。SHOW=0 完全不印。
       if [ "$SHOW" -gt 0 ]; then
         n=$(grep -c '' <<<"$out")
