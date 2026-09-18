@@ -32,7 +32,7 @@ export LLMSHARE_API_KEY='你的-Virtual-Key'
 
 端點同樣讀 `LLMSHARE_BASE_URL`，預設就是多奇的閘道 `https://llm-share.duotify.com/v1`。模型代號用 `llmshare models` 查，要打別的 OpenAI 相容端點就改這個環境變數。
 
-它是單一檔案，所以可以直接從 raw URL 跑起來，不需要 clone 也不需要 npm：
+它是單一檔案，所以可以直接從 raw URL 跑起來，不需要 clone 也不需要 npm（這個 repo 還沒有推上 GitHub，下面的網址要等推上去才會通）：
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yazelin/tiny-harness/main/agent.sh | bash -s -- deepseek-v4.1-flash
